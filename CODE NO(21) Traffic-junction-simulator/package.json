@@ -1,0 +1,20 @@
+{
+  "name": "traffic-junction-simulator",
+  "version": "1.0.0",
+  "description": "High-performance Left-Hand Traffic junction simulator with collision-free IDM physics, adaptive AI signal optimization, and real-time comparative analytics.",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "traffic",
+    "simulator",
+    "idm",
+    "canvas",
+    "adaptive-signal",
+    "lhd"
+  ],
+  "author": "",
+  "license": "MIT"
+}

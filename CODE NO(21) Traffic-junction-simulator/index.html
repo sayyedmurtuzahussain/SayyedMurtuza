@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LHD Traffic Junction Simulator — Fixed vs Adaptive AI</title>
+  <meta name="description" content="Interactive high-performance Left-Hand Traffic junction simulator with collision-free IDM physics, adaptive AI signal optimization, emergency corridor preemption, and real-time comparative analytics.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- App Container -->
+  <div id="app" class="app-layout">
+    
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-badge">LHD</div>
+        <div class="brand-title">
+          <h1>Traffic Junction Simulator</h1>
+          <span class="brand-sub">Left-Hand Traffic • Zero-Collision IDM • Dual Benchmark</span>
+        </div>
+      </div>
+
+      <!-- Center Playback Controls -->
+      <div class="header-controls">
+        <button id="btn-play-pause" class="btn btn-primary" title="Play or Pause simulation">
+          <svg class="icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+          Pause
+        </button>
+        <button id="btn-step" class="btn btn-secondary" title="Step forward 1 tick (1/60s)">
+          <svg class="icon" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg>
+          Step
+        </button>
+        <button id="btn-reset" class="btn btn-danger" title="Clean reset all metrics and vehicles from seed">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>
+          Reset
+        </button>
+
+        <div class="divider-v"></div>
+
+        <!-- Speed Multipliers -->
+        <div class="pill-group" title="Simulation Speed">
+          <button class="pill-btn btn-speed" data-speed="0.5">0.5x</button>
+          <button class="pill-btn btn-speed active" data-speed="1">1x</button>
+          <button class="pill-btn btn-speed" data-speed="2">2x</button>
+          <button class="pill-btn btn-speed" data-speed="4">4x</button>
+        </div>
+
+        <div class="divider-v"></div>
+
+        <!-- Audio Mute Toggle -->
+        <button id="btn-sound" class="btn-icon" title="Toggle Emergency Siren Sound">
+          <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+        </button>
+      </div>
+
+      <!-- View Switcher -->
+      <div class="view-switcher">
+        <button class="pill-btn btn-view active" data-view="sideBySide" title="Side-by-Side Dual View">Side-by-Side</button>
+        <button class="pill-btn btn-view" data-view="simA" title="Fixed Cycle Mode">Fixed Only</button>
+        <button class="pill-btn btn-view" data-view="simB" title="Adaptive AI Mode">Adaptive Only</button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="simulation-main">
+      <!-- Simulation Canvas Viewport -->
+      <div class="canvas-container">
+        <canvas id="junction-canvas"></canvas>
+
+        <!-- Signal Accessibility Legend Overlay -->
+        <div class="signal-legend" title="High Contrast B&W Accessible Signal Shapes">
+          <div class="legend-item"><span class="legend-shape shape-go">● GO</span> Green</div>
+          <div class="legend-item"><span class="legend-shape shape-wait">▲ WAIT</span> Amber</div>
+          <div class="legend-item"><span class="legend-shape shape-stop">■ STOP</span> Red</div>
+          <div class="legend-item"><span class="legend-slip">↩ Free Left</span> Slip Lane</div>
+        </div>
+      </div>
+
+      <!-- Right Analytics & Controls Panel -->
+      <aside class="sidebar-panel">
+        
+        <!-- Live Benchmark Differential Banner -->
+        <div class="diff-banner card">
+          <div class="diff-header">
+            <h3>AI Adaptive Performance Advantage</h3>
+            <span class="badge badge-ai">Same Seed Parity</span>
+          </div>
+          <div class="diff-metrics">
+            <div class="diff-item">
+              <span class="diff-label">Avg Wait Time:</span>
+              <span id="diff-wait" class="diff-badge neutral">0.0s (Parity)</span>
+            </div>
+            <div class="diff-item">
+              <span class="diff-label">Queue Backlog:</span>
+              <span id="diff-queue" class="diff-badge neutral">0 cars</span>
+            </div>
+          </div>
+          <!-- Live Chart -->
+          <div class="chart-wrapper">
+            <div class="chart-legend">
+              <span class="legend-series color-fixed">■ Fixed Cycle</span>
+              <span class="legend-series color-adaptive">■ Adaptive AI</span>
+            </div>
+            <canvas id="chart-canvas" width="280" height="60"></canvas>
+          </div>
+        </div>
+
+        <!-- Comparative Metrics Grid -->
+        <div class="metrics-grid">
+          <!-- Sim A (Fixed) Card -->
+          <div class="sim-card card-sim-a">
+            <div class="sim-card-header">
+              <h4>Sim A: Fixed Cycle</h4>
+              <span class="sim-tag tag-fixed">Fixed 14s/3s/2s</span>
+            </div>
+            <div class="sim-stat-row">
+              <div class="stat-box">
+                <span class="stat-num" id="stat-passed-a">0</span>
+                <span class="stat-lbl">Passed</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-num text-cyan" id="stat-wait-a">0.0s</span>
+                <span class="stat-lbl">Avg Wait</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-num text-amber" id="stat-queue-a">0</span>
+                <span class="stat-lbl">Queued</span>
+              </div>
+            </div>
+            <div class="dir-stats-grid" id="dir-stats-a"></div>
+          </div>
+
+          <!-- Sim B (Adaptive AI) Card -->
+          <div class="sim-card card-sim-b">
+            <div class="sim-card-header">
+              <h4>Sim B: Adaptive AI</h4>
+              <span class="sim-tag tag-adaptive">Queue Actuated</span>
+            </div>
+            <div class="sim-stat-row">
+              <div class="stat-box">
+                <span class="stat-num" id="stat-passed-b">0</span>
+                <span class="stat-lbl">Passed</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-num text-emerald" id="stat-wait-b">0.0s</span>
+                <span class="stat-lbl">Avg Wait</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-num text-amber" id="stat-queue-b">0</span>
+                <span class="stat-lbl">Queued</span>
+              </div>
+            </div>
+            <div class="dir-stats-grid" id="dir-stats-b"></div>
+          </div>
+        </div>
+
+        <!-- Directional Arrival Rate Sliders -->
+        <div class="card rates-card">
+          <div class="card-title">
+            <h4>Traffic Inflow Rates (Cars / Minute)</h4>
+          </div>
+          <div class="rate-sliders">
+            <div class="slider-row">
+              <span class="slider-label">North (↓)</span>
+              <input type="range" id="rate-north" min="0" max="30" value="14" step="1">
+              <span class="slider-val" id="val-north">14 /min</span>
+            </div>
+            <div class="slider-row">
+              <span class="slider-label">South (↑)</span>
+              <input type="range" id="rate-south" min="0" max="30" value="14" step="1">
+              <span class="slider-val" id="val-south">14 /min</span>
+            </div>
+            <div class="slider-row">
+              <span class="slider-label">East (←)</span>
+              <input type="range" id="rate-east" min="0" max="30" value="10" step="1">
+              <span class="slider-val" id="val-east">10 /min</span>
+            </div>
+            <div class="slider-row">
+              <span class="slider-label">West (→)</span>
+              <input type="range" id="rate-west" min="0" max="30" value="10" step="1">
+              <span class="slider-val" id="val-west">10 /min</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Emergency Corridor Trigger -->
+        <div class="card emergency-card">
+          <div class="card-title">
+            <h4>Priority Emergency Corridor (Green Wave)</h4>
+          </div>
+          <p class="card-desc">Instantly triggers safe Amber → All-Red clearance → Locked Green wave corridor until cleared.</p>
+          <div class="emergency-buttons">
+            <button class="btn btn-emergency" data-dir="north">🚑 From North</button>
+            <button class="btn btn-emergency" data-dir="south">🚑 From South</button>
+            <button class="btn btn-emergency" data-dir="east">🚑 From East</button>
+            <button class="btn btn-emergency" data-dir="west">🚑 From West</button>
+          </div>
+        </div>
+
+      </aside>
+    </main>
+
+    <!-- Vehicle Inspector Popover -->
+    <div id="inspector-popover" class="inspector-card"></div>
+
+  </div>
+
+  <!-- Main ES6 Module Application Entry -->
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
