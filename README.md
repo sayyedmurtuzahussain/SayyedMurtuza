@@ -73,8 +73,7 @@ cd <your-repo>
 Open `index.html` in a browser, or serve it locally:
 
 ```bash
-python -m http.server 8000
-# then visit http://localhost:8000
+http://127.0.0.1:3000/
 ```
 
 ## Testing the simulator
